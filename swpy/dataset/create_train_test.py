@@ -60,6 +60,7 @@ omni_events_set = set(omni_events)
 # trainの場合
 # =====================================
 
+all_dst_df  = pd.DataFrame()
 all_omni_df = pd.DataFrame()
 for index, event in train_events_df.iterrows():
     Data_start = event.Data_start
@@ -75,13 +76,27 @@ for index, event in train_events_df.iterrows():
         shutil.copyfile(dst_full_path, train_dst_output_dir + os.path.basename(dst_full_path))
         shutil.copyfile(omni_full_path, train_omni_output_dir + os.path.basename(omni_full_path))
 
+    dst_df = pd.read_csv(dst_full_path)
+    all_dst_df = pd.concat([all_dst_df, dst_df])
     omni_df = pd.read_csv(omni_full_path)
     all_omni_df = pd.concat([all_omni_df, omni_df])
 
-# omni_data の統計値出力
-mean = all_omni_df.mean().to_json(train_omni_output_dir + 'mean.json')
-var  = all_omni_df.var().to_json(train_omni_output_dir + 'var.json')
+# Dst の統計値出力
+mean = all_dst_df.mean()
+mean.name='mean'
+var = all_dst_df.var()
+var.name='var'
+st_df = pd.concat([mean,var],axis=1)
+st_df.to_csv(train_dst_output_dir + 'statistics.csv')
 
+
+# omni_data の統計値出力
+mean = all_omni_df.mean()
+mean.name='mean'
+var = all_omni_df.var()
+var.name='var'
+st_df = pd.concat([mean,var],axis=1)
+st_df.to_csv(train_omni_output_dir + 'statistics.csv')
 
 # testの場合
 for index, event in test_events_df.iterrows():
