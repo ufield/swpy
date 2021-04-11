@@ -8,12 +8,14 @@ class FCLayer(nn.Module):
             activation='ReLU',
             dropout=0
         ):
-        super(FCLayer, self).__init__()
+        super().__init__()
+        # super(FCLayer, self).__init__()
         layers = []
         layers.append(nn.Dropout(dropout))
         if activation != '':
             layers.append(getattr(nn, activation)())
-        layers.append(weight_norm(nn.Linear(input_dim, output_dim), dim=None))
+        layers.append(nn.Linear(input_dim, output_dim))
+        # layers.append(weight_norm(nn.Linear(input_dim, output_dim), dim=None))
         self.sequential = nn.Sequential(*layers)
 
     def forward(self, x):
