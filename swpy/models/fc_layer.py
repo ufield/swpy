@@ -12,9 +12,9 @@ class FCLayer(nn.Module):
         # super(FCLayer, self).__init__()
         layers = []
         layers.append(nn.Dropout(dropout))
+        layers.append(nn.Linear(input_dim, output_dim))
         if activation != '':
             layers.append(getattr(nn, activation)())
-        layers.append(nn.Linear(input_dim, output_dim))
         # layers.append(weight_norm(nn.Linear(input_dim, output_dim), dim=None))
         self.sequential = nn.Sequential(*layers)
 

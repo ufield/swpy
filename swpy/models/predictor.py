@@ -43,8 +43,8 @@ class MlpPredictor(nn.Module):
 
 class MlpPredictorOmniMean(nn.Module):
 
-    h_dim_1 = 100
-    h_dim_2 = 10
+    h_dim_1 = 20
+    h_dim_2 = 5
 
     def __init__(self, phase, len_dst_p, num_omni_pqs):
         super().__init__()
@@ -61,7 +61,7 @@ class MlpPredictorOmniMean(nn.Module):
 
         self.linear_1 = FCLayer(self.h_dim_1*(1 + num_omni_pqs), self.h_dim_1*(1 + num_omni_pqs))
         self.linear_2 = FCLayer(self.h_dim_1*(1 + num_omni_pqs), self.h_dim_2*(1 + num_omni_pqs))
-        self.linear_3 = FCLayer(self.h_dim_2*(1 + num_omni_pqs), 1)
+        self.linear_3 = FCLayer(self.h_dim_2*(1 + num_omni_pqs), 1, activation='')
 
     def forward(self, dst_p, omni_data):
         h = self.dst_p_net(dst_p)
