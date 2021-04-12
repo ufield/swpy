@@ -187,6 +187,7 @@ class DstTargetDataset():
 
         dst_rows = len(dst_df)
         for i in range(dst_rows - (self.udt + self.pft - 1)):
+            # import pdb; pdb.set_trace()
             dst_step = i + self.udt
             dst_f = np.double(dst_df[dst_step + (self.pft - 1):dst_step + 1 + (self.pft - 1)][dst_key])
             dataset['DST_f'] = np.append(dataset['DST_f'], np.array([[dst_f]]), axis=0)
@@ -197,7 +198,7 @@ class DstTargetDataset():
             dst_diff = dst_f - dst_p[-1]
             dataset['DST_diff'] = np.append(dataset['DST_diff'], np.array([[dst_diff]]), axis=0)
 
-            omni_range_start = i * int(60 / self.omni_step_min)
+            omni_range_start = i * int(60 / self.omni_step_min) + 1
             omni_range_end = i * int(60 / self.omni_step_min) + (self.udt - 1) * int(60 / self.omni_step_min) + 1
             this_df = omni_df[omni_range_start:omni_range_end]
 

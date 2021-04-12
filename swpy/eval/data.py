@@ -1,9 +1,12 @@
+import numpy as np
+
 import torch.utils.data as data
 import sys
 
-sys.path.append('../models/')
+sys.path.append('../dataset')
 
 from dataset import DstModelDataset
+from utils.transform import standardize, inverse_standardize
 
 def create_eval_dataset_per_event(dataset_per_event, st):
     eval_dataset_per_event = dict()
@@ -29,3 +32,17 @@ def create_eval_dataset_per_event(dataset_per_event, st):
         eval_dataset_per_event[key]= iter(dataloader)
 
     return eval_dataset_per_event
+
+def predict(net, eval_dataset, st):
+    dst_predict = np.arange(0)
+    dst_gt      = np.arange(0)
+
+    for dst_f, dst_p, dst_diff, omni_data in eval_dataset:
+        outputs = net(dst_p.float(), omni_data)
+
+        out = outputs.detach().numpy()
+
+        dst_predict = np.append(dst_predict, inverse_standardize(out, st['mean']['DST'], st['var']['DST']))
+        dst_gt = np.append(dst_gt,inverse_standardize(dst_f, st['mean']['DST'], st['var']['DST']))
+
+    return dst_predict, dst_gt
