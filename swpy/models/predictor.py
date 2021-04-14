@@ -79,7 +79,7 @@ class MlpPredictorOmniMean(nn.Module):
 
 
 class LSTMPredictorOmniMean(nn.Module):
-    h_dim_lstm = 20
+    h_dim_lstm = 25
     h_dim_fcl  = 5
 
     def __init__(self, phase, len_dst_p, num_omni_pqs):
@@ -91,8 +91,8 @@ class LSTMPredictorOmniMean(nn.Module):
         self.avgPool1d = nn.AvgPool1d(10, stride=10)
         self.lstm = nn.LSTM(num_omni_pqs + 1, self.h_dim_lstm * self.num_vals, batch_first=True)
         # self.linear_1 = FCLayer(self.h_dim_lstm * self.num_vals, self.h_dim_fcl * self.num_vals)
-        self.linear_1 = FCLayer(self.h_dim_lstm * self.num_vals, 1)
-        # self.linear_2 = FCLayer(self.h_dim_fcl * self.num_vals, 1)
+        self.linear_1 = FCLayer(self.h_dim_lstm * self.num_vals, self.h_dim_fcl * self.num_vals, dropout=0.5)
+        self.linear_out = FCLayer(self.h_dim_fcl * self.num_vals, 1, activation='', dropout=0.5)
 
     def forward(self, dst_p, omni_data):
         inputs = torch.zeros(dst_p.shape[0], dst_p.shape[1], self.num_vals)
@@ -113,7 +113,7 @@ class LSTMPredictorOmniMean(nn.Module):
 
         # 全結合層に流す
         h_1 = self.linear_1(lstm_out)
-        # out = self.linear_2(h_1)
-        return h_1
+        out = self.linear_out(h_1)
+        # return h_1
 
-        # return out
+        return out
