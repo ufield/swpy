@@ -6,9 +6,11 @@ import sys
 import pdb
 
 sys.path.append('../dataset')
+sys.path.append('../models')
 
 from dataset import DstModelDataset
 from utils.transform import standardize, inverse_standardize
+from data_processes import create_inputs_with_omni_mean
 
 def create_eval_dataset_per_event(dataset_per_event, st):
     eval_dataset_per_event = dict()
@@ -40,7 +42,9 @@ def predict(net, eval_dataset, st):
     dst_gt      = np.arange(0)
 
     for dst_f, dst_p, dst_diff, omni_data in eval_dataset:
-        outputs = net(dst_p.float(), omni_data)
+        x = create_inputs_with_omni_mean(dst_p.float(), omni_data)
+        outputs = net(x)
+        # outputs = net(dst_p.float(), omni_data)
 
         out = outputs.detach().numpy()
 
