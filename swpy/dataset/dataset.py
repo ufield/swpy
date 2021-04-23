@@ -45,66 +45,6 @@ class DstModelDataset(data.Dataset):
         return  dst_f, dst_p, dst_diff, omni_data
 
 
-
-# class DSTFlatData():
-#     def __init__(self, pft, udt, omni_size, omni_step_min, pq_inout_name_map, dst_data_dir, omni_data_dir):
-#         self.pft               = pft
-#         self.udt               = udt
-#         self.omni_size         = omni_size
-#         self.omni_step_min     = omni_step_min
-#         self.pq_inout_name_map = pq_inout_name_map
-#         self.dst_data_dir      = dst_data_dir
-#         self.omni_data_dir     = omni_data_dir
-#         self.dst_flat_data     = []
-
-
-#     def has_omni_data_null(self, omni_data):
-#         for key, nparray in omni_data.items():
-#             if np.isnan(nparray).any():
-#                 return True
-#         return False
-
-
-#     def _append_event_data(self, dst_data_path, omni_data_path):
-#         dst_df = pd.read_csv(dst_data_path)
-#         omni_df = pd.read_csv(omni_data_path)
-
-#         dst_rows = len(dst_df)
-#         for i in range(dst_rows - (self.udt + self.pft - 1)):
-#             dst_step = i + self.udt
-#             omni_data = dict()
-
-#             for key, val in self.pq_inout_name_map.items():
-
-#                 if 'DST' in key:
-#                     dst_f = np.double(dst_df[dst_step + (self.pft - 1):dst_step + 1 + (self.pft - 1)][key])
-#                     dst_p = dst_df[i:dst_step][key].values
-#                     dst_diff = dst_f - dst_p[-1]
-
-#                 else:
-#                     omni_range_start = i * int(60 / self.omni_step_min)
-#                     omni_range_end = i * int(60 / self.omni_step_min) + (self.udt - 1) * int(60 / self.omni_step_min) + 1
-#                     this_df = omni_df[omni_range_start:omni_range_end]
-
-#                     omni_data[val] = this_df[key].values
-
-#             if self.has_omni_data_null(omni_data):
-#                 break
-
-#             self.dst_flat_data.append({'DST_f': dst_f, 'DST_p': dst_p, 'DST_diff': dst_diff, 'omni': omni_data})
-
-#     def create_flat_data(self):
-#         self.dst_flat_data = []
-#         dst_data_paths  = sorted(glob(self.dst_data_dir + 'storm*.csv'))
-#         omni_data_paths = sorted(glob(self.omni_data_dir + 'storm*.csv'))
-
-#         for dst_data_path, omni_data_path in zip(dst_data_paths, omni_data_paths):
-#             self._append_event_data(dst_data_path, omni_data_path)
-
-#         return self.dst_flat_data
-
-
-
 class DstTargetDataset():
 
     event_dt_prog = re.compile(r'\d{10}_\d{10}')
