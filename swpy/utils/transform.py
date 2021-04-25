@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def standardize(a, mean, var):
     return (a - mean)/np.sqrt(var)
 

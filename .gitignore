@@ -3,5 +3,7 @@ __pycache__/
 
 notebooks/
 venv/
+outputs/
 .DS_Store
 
+.vscode/
