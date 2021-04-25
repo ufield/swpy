@@ -9,6 +9,8 @@ sys.path.append('../utils')
 from data_processes import create_inputs_with_omni_mean
 from files import make_dirs
 
+import gpytorch
+
 def train_nn(net, dataloaders_dict, criterion, optimizer, num_epochs=50, outdir_root='.'):
 
     # GPU使えるか
@@ -97,9 +99,48 @@ def train_nn(net, dataloaders_dict, criterion, optimizer, num_epochs=50, outdir_
 
         # weight を保存
         if ((epoch+1) % 10 == 0):
-            make_dirs(outdir_root + '/weights')
-            torch.save(net.state_dict(), '{}/weights/weights_{}.pth'.format(outdir_root, str(epoch + 1)))
+            path = outdir_root + '/weights'
+            make_dirs(path)
+            torch.save(net.state_dict(), '{}/weights_{}.pth'.format(path, str(epoch + 1)))
 
 
-def train_gp():
-    pass
+def train_gp(train_x, train_y, model, likelihood, optimizer, num_epochs=50, outdir_root='.'):
+    mll = gpytorch.mlls.ExactMarginalLogLikelihood(likelihood, model)
+
+    logs = []
+    for iter in range(num_epochs + 1):
+        # Zero gradients from previous iteration
+        optimizer.zero_grad()
+        # Output from model
+        output = model(train_x)
+        # Calc loss and backprop gradients
+
+        loss = -mll(output, train_y.float())
+        loss.backward()
+
+        optimizer.step()
+
+
+        # -------------------------------
+        lengthscale = model.covar_module.base_kernel.lengthscale.item()
+        noise = model.likelihood.noise.item()
+
+        print('Epoch %d/%d - Loss: %.3f   lengthscale: %.3f   noise: %.3f' % (
+            iter + 1, num_epochs, loss.item(),
+            lengthscale,
+            noise
+        ))
+
+        # ログ保存
+        log_epoch = {'epoch': iter + 1, 'train_loss': loss, 'lengthscale': lengthscale, 'noise': noise}
+        logs.append(log_epoch)
+        df = pd.DataFrame(logs)
+        make_dirs(outdir_root)
+        df.to_csv('{}/log_gp.csv'.format(outdir_root))
+
+        # モデルを保存
+        if ((iter+1) % 10 == 0):
+            path = outdir_root + '/gp_models'
+            make_dirs(path)
+            torch.save(model.state_dict(), '{}/gp_model_{}.pth'.format(path, str(iter + 1)))
+
