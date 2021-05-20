@@ -1,7 +1,10 @@
+import sys
+import datetime
+
 import numpy as np
+import pandas as pd
 
 import torch.utils.data as data
-import sys
 
 import pdb
 
@@ -9,8 +12,6 @@ sys.path.append('../dataset')
 sys.path.append('../models')
 
 from dataset import DstModelDataset
-from utils.transform import standardize, inverse_standardize
-from data_processes import create_inputs_with_omni_mean
 
 def create_eval_dataset_per_event(dataset_per_event, st):
     eval_dataset_per_event = dict()
@@ -37,18 +38,32 @@ def create_eval_dataset_per_event(dataset_per_event, st):
 
     return eval_dataset_per_event
 
-def predict(net, eval_dataset, st):
-    dst_predict = np.arange(0)
-    dst_gt      = np.arange(0)
+def _pad_nan(arr, pad_num):
+    pad_arr = np.full(pad_num, np.nan)
+    return np.concatenate([pad_arr, arr])
 
-    for dst_f, dst_p, dst_diff, omni_data in eval_dataset:
-        x = create_inputs_with_omni_mean(dst_p.float(), omni_data)
-        outputs = net(x)
-        # outputs = net(dst_p.float(), omni_data)
 
-        out = outputs.detach().numpy()
+def create_pandas_dfs_for_result_plot(dst_csv_file_path, omni_csv_file_path, dst_pred, cr_lower, cr_upper):
+    dst_df  = pd.read_csv(dst_csv_file_path)
+    omni_df = pd.read_csv(omni_csv_file_path)
 
-        dst_predict = np.append(dst_predict, inverse_standardize(out, st['mean']['DST'], st['var']['DST']))
-        dst_gt = np.append(dst_gt,inverse_standardize(dst_f, st['mean']['DST'], st['var']['DST']))
+    dt_conv_dst  = lambda x: datetime.datetime.strptime(str(x), "%Y%m%d%H")
+    dt_conv_omni = lambda x: datetime.datetime.strptime(str(x), "%Y%m%d%H%M")
 
-    return dst_predict, dst_gt
+    dst_df['Time']  = dst_df['Time'].map(dt_conv_dst)
+    omni_df['Time'] = omni_df['Time'].map(dt_conv_omni)
+
+    obs_len = len(dst_df)
+    pad_num = obs_len - len(dst_pred)
+
+    dst_pad = _pad_nan(dst_pred, pad_num)
+    cr_lower_pad = _pad_nan(cr_lower, pad_num)
+    cr_upper_pad = _pad_nan(cr_upper, pad_num)
+
+
+    dst_df['DST_pred'] = dst_pad
+    dst_df['cr_lower'] = cr_lower_pad
+    dst_df['cr_upper'] = cr_upper_pad
+
+    return dst_df, omni_df
+
