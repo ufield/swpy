@@ -124,23 +124,25 @@ class DstTargetDataset():
     def _append_event_data(self, dataset, dst_key, dst_data_path, omni_data_path):
         dst_df = pd.read_csv(dst_data_path)
         omni_df = pd.read_csv(omni_data_path)
+        omni_step = int(60 / self.omni_step_min)
 
         dst_rows = len(dst_df)
-        for i in range(dst_rows - (self.udt + self.pft - 1)):
-            # import pdb; pdb.set_trace()
+        for i in range(dst_rows - (self.udt + self.pft)):
             dst_step = i + self.udt
-            dst_f = np.double(dst_df[dst_step + (self.pft - 1):dst_step + 1 + (self.pft - 1)][dst_key])
+            dst_f = np.double(dst_df[dst_step + self.pft:dst_step + self.pft + 1][dst_key])
             dataset['DST_f'] = np.append(dataset['DST_f'], np.array([[dst_f]]), axis=0)
 
-            dst_p = dst_df[i:dst_step][dst_key].values
+            dst_p = dst_df[i + 1:dst_step + 1][dst_key].values
             dataset['DST_p'] = np.append(dataset['DST_p'], np.array([dst_p]), axis=0)
 
             dst_diff = dst_f - dst_p[-1]
             dataset['DST_diff'] = np.append(dataset['DST_diff'], np.array([[dst_diff]]), axis=0)
 
-            omni_range_start = i * int(60 / self.omni_step_min) + 1
-            omni_range_end = i * int(60 / self.omni_step_min) + (self.udt - 1) * int(60 / self.omni_step_min) + 1
+            omni_range_start = i * omni_step + 1
+            # omni_range_end = i * int(60 / self.omni_step_min) + (self.udt - 1) * int(60 / self.omni_step_min) + 1
+            omni_range_end = (i + self.udt)*omni_step + 1
             this_df = omni_df[omni_range_start:omni_range_end]
+            # import pdb; pdb.set_trace()
 
             for key, val in self.pq_inout_name_map.items():
                 if 'DST' in key:

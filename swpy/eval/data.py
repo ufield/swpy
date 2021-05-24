@@ -67,3 +67,25 @@ def create_pandas_dfs_for_result_plot(dst_csv_file_path, omni_csv_file_path, dst
 
     return dst_df, omni_df
 
+def create_pandas_dfs_for_result_nn_plot(dst_csv_file_path, omni_csv_file_path, dst_pred):
+    dst_df  = pd.read_csv(dst_csv_file_path)
+    omni_df = pd.read_csv(omni_csv_file_path)
+
+    dt_conv_dst  = lambda x: datetime.datetime.strptime(str(x), "%Y%m%d%H")
+    dt_conv_omni = lambda x: datetime.datetime.strptime(str(x), "%Y%m%d%H%M")
+
+    dst_df['Time']  = dst_df['Time'].map(dt_conv_dst)
+    omni_df['Time'] = omni_df['Time'].map(dt_conv_omni)
+
+    # pdb.set_trace()
+
+    obs_len = len(dst_df)
+    pad_num = obs_len - len(dst_pred)
+
+    dst_pad = _pad_nan(dst_pred, pad_num)
+
+
+    dst_df['DST_pred'] = dst_pad
+
+    return dst_df, omni_df
+

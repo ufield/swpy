@@ -4,7 +4,7 @@ import torch.utils.data as data
 
 from dataset import DstModelDataset
 
-def create_inputs_with_omni_mean(dst_p, omni_data, num_omni_pqs=4, avg_window=10):
+def create_inputs_with_omni_mean(dst_p, omni_data, num_omni_pqs=4, avg_window=12):
     num_vals = num_omni_pqs + 1
     inputs = torch.zeros(dst_p.shape[0], dst_p.shape[1], num_vals)
     avgPool1d = nn.AvgPool1d(avg_window, stride=avg_window)
