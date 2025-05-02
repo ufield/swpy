@@ -82,3 +82,5 @@ python swpy/dataset/create_train_test.py --targets flow_speed,BZ_GSM,F,proton_de
 ## 参照
 
 このプロジェクトはGruet_2018の研究に基づいています。
+
+- [ガウス過程と機械学習 (機械学習プロフェッショナルシリーズ)](https://www.amazon.co.jp/%E3%82%AC%E3%82%A6%E3%82%B9%E9%81%8E%E7%A8%8B%E3%81%A8%E6%A9%9F%E6%A2%B0%E5%AD%A6%E7%BF%92-%E6%A9%9F%E6%A2%B0%E5%AD%A6%E7%BF%92%E3%83%97%E3%83%AD%E3%83%95%E3%82%A7%E3%83%83%E3%82%B7%E3%83%A7%E3%83%8A%E3%83%AB%E3%82%B7%E3%83%AA%E3%83%BC%E3%82%BA-%E6%8C%81%E6%A9%8B-%E5%A4%A7%E5%9C%B0/dp/4061529269)
